@@ -22,22 +22,44 @@ Allow users to:
 ## 🧱 Project Structure
 
 ```
-project-root/
-├── client/                   # React Frontend
+CITI-HACKATHON/
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── routes.py           # FastAPI route handlers
+│   │   │   └── __init__.py
+│   │   ├── core/
+│   │   │   ├── models.py           # Pydantic models (Debt, CalculationRequest)
+│   │   │   └── logic.py            # Core calculation logic (snowball/avalanche)
+│   │   ├── main.py                 # FastAPI entry point
+│   │   └── __init__.py
+│   ├── requirements.txt
+│   └── uvicorn.config.json
+│
+├── frontend/
 │   ├── public/
-│   └── src/
-│       ├── components/
-│       ├── pages/
-│       └── App.jsx
-├── server/                   # FastAPI Backend
-│   ├── main.py
-│   ├── models.py
-│   ├── schemas.py
-│   └── routes/
-│       └── debt_routes.py
-├── requirements.txt
+│   │   └── index.html
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── DebtForm.jsx
+│   │   │   ├── ExtraPaymentInput.jsx
+│   │   │   ├── StrategyToggle.jsx
+│   │   │   ├── DebtList.jsx
+│   │   │   └── DebtCard.jsx
+│   │   ├── pages/
+│   │   │   ├── LandingPage.jsx
+│   │   │   └── TrackerPage.jsx
+│   │   ├── App.jsx
+│   │   └── index.jsx
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── vite.config.js
+│   └── eslint.config.js
+│
+├── .gitignore
 ├── README.md
-└── package.json
+├── doc.md                     # Project documentation
+
 ```
 
 ---
