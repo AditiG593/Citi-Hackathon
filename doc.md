@@ -38,21 +38,24 @@
 ### ✅ Base Folder Structure:
 
 ```
-project-root/
-├── client/              # React frontend
+debt-tracker/
+├── backend/                # FastAPI backend
+│   ├── app/
+│   │   ├── main.py         # FastAPI app entry point
+│   │   ├── api/
+│   │   │   └── routes.py   # Routes and logic
+│   │   └── models.py       # Pydantic models
+│   ├── requirements.txt
+│   └── uvicorn.config.json
+├── frontend/               # React frontend
 │   ├── public/
 │   └── src/
 │       ├── components/
 │       ├── pages/
-│       └── App.js
-├── server/              # Express backend
-│   ├── routes/
-│   │   └── debtRoutes.js
-│   ├── controllers/
-│   │   └── debtController.js
-│   └── index.js
-├── package.json
+│       └── App.jsx
+├── .gitignore
 ├── README.md
+
 ```
 
 ---
