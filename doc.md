@@ -1,191 +1,174 @@
-# 🔧 Debt Snowball/Avalanche Tracker – MVP Technical Document
+# 📘 MVP Technical Document
 
-> **Tech Stack**: React + Express.js (no authentication)
-> **Goal**: Help users plan and visualize debt repayment using Snowball or Avalanche strategy.
+### Debt Snowball / Avalanche Repayment Tracker
 
----
-
-## 📄 Pages & Components (React)
-
-### 1. **`/` – Landing Page**
-
-* Purpose: Explain the tool briefly and provide a "Start Tracking" button.
-* Components:
-
-  * `Header`
-  * `IntroSection`
-  * `GetStartedButton`
+**Frontend**: ReactJS
+**Backend**: FastAPI (Python)
+**No Authentication (for MVP)**
 
 ---
 
-### 2. **`/tracker` – Debt Tracker Page**
+## 🎯 Goal:
 
-* Purpose: Core functionality for input and visualization.
-* Components:
+Allow users to:
 
-  * `DebtForm` – Inputs for debt name, balance, min payment, interest rate.
-  * `ExtraPaymentInput` – Field to input extra monthly payment (default = 50).
-  * `StrategyToggle` – Toggle between "Snowball" and "Avalanche".
-  * `DebtList` – Display debts in calculated repayment order.
-  * `DebtCard` – Individual debt summary with highlight if targeted.
-
-> All state can be managed with React `useState` + `useEffect`.
+* Enter debts
+* Specify an extra payment amount
+* Choose repayment strategy: **Snowball** or **Avalanche**
+* Display debts reordered based on the chosen method
 
 ---
 
-## 🧱 Backend Overview (Express.js)
-
-### ✅ Base Folder Structure:
+## 🧱 Project Structure
 
 ```
-debt-tracker/
-├── backend/                # FastAPI backend
-│   ├── app/
-│   │   ├── main.py         # FastAPI app entry point
-│   │   ├── api/
-│   │   │   └── routes.py   # Routes and logic
-│   │   └── models.py       # Pydantic models
-│   ├── requirements.txt
-│   └── uvicorn.config.json
-├── frontend/               # React frontend
+project-root/
+├── client/                   # React Frontend
 │   ├── public/
 │   └── src/
 │       ├── components/
 │       ├── pages/
 │       └── App.jsx
-├── .gitignore
+├── server/                   # FastAPI Backend
+│   ├── main.py
+│   ├── models.py
+│   ├── schemas.py
+│   └── routes/
+│       └── debt_routes.py
+├── requirements.txt
 ├── README.md
-
+└── package.json
 ```
 
 ---
 
-## 🗃️ Data Model (In-Memory – No Auth for MVP)
+## 🖼️ Frontend Pages (ReactJS)
 
-### Example Debt Object:
+### 1. `/` – Landing Page
 
-```js
-{
-  id: "uuid",
-  name: "Credit Card A",
-  balance: 3200,
-  minPayment: 150,
-  interestRate: 18.5
-}
-```
+* **Description**: App intro and "Get Started" CTA
+* **Components**:
 
-> Store in `debts = []` in memory (for MVP). Could switch to MongoDB or SQLite later.
+  * `Header`
+  * `IntroSection`
+  * `GetStartedButton` (navigates to `/tracker`)
 
----
+### 2. `/tracker` – Debt Tracker
 
-## 📊 Database Structure (Optional Future)
+* **Components**:
 
-### If SQL:
+  * `DebtForm` (input name, balance, min payment, interest rate)
+  * `ExtraPaymentInput` (default \$50)
+  * `StrategyToggle` (radio or toggle between snowball/avalanche)
+  * `DebtList` (display reordered debts)
+  * `DebtCard` (one per debt, highlights first target)
 
-**Table: debts**
-
-| Column         | Type    |
-| -------------- | ------- |
-| id             | UUID    |
-| name           | TEXT    |
-| balance        | DECIMAL |
-| min\_payment   | DECIMAL |
-| interest\_rate | DECIMAL |
-
-### If MongoDB:
-
-```js
-{
-  _id: ObjectId,
-  name: String,
-  balance: Number,
-  minPayment: Number,
-  interestRate: Number
-}
-```
+> Use `useState` and `useEffect` to manage form data and API interaction.
 
 ---
 
-## 🔁 Express API Routes
+## 📦 Backend (FastAPI)
 
-| Method | Endpoint         | Description                      |
-| ------ | ---------------- | -------------------------------- |
-| GET    | `/api/debts`     | Get list of debts                |
-| POST   | `/api/debts`     | Add a new debt                   |
-| DELETE | `/api/debts/:id` | Delete a specific debt           |
-| POST   | `/api/calculate` | Calculate repayment order (core) |
+### ✔️ Endpoints
+
+| Method   | Endpoint      | Description               |
+| -------- | ------------- | ------------------------- |
+| `GET`    | `/debts`      | Return list of all debts  |
+| `POST`   | `/debts`      | Add a new debt            |
+| `DELETE` | `/debts/{id}` | Delete a debt             |
+| `POST`   | `/calculate`  | Calculate repayment order |
 
 ---
 
-### 📥 Example `POST /api/calculate` Input
+### 📤 Sample `POST /calculate` Input
 
 ```json
 {
   "debts": [
-    { "name": "Loan A", "balance": 1000, "minPayment": 50, "interestRate": 12.0 },
-    ...
+    {
+      "name": "Credit Card 1",
+      "balance": 3000,
+      "min_payment": 100,
+      "interest_rate": 18.5
+    },
+    {
+      "name": "Loan A",
+      "balance": 2000,
+      "min_payment": 150,
+      "interest_rate": 8.0
+    }
   ],
-  "strategy": "snowball",
-  "extraPayment": 50
+  "strategy": "avalanche",
+  "extra_payment": 50
 }
 ```
 
-### 📤 Example Response
+### 📥 Sample Response
 
 ```json
 [
   {
-    "name": "Loan A",
-    "balance": 1000,
-    "minPayment": 50,
-    "interestRate": 12.0,
+    "name": "Credit Card 1",
+    "balance": 3000,
+    "min_payment": 100,
+    "interest_rate": 18.5,
     "target": true
   },
-  ...
+  {
+    "name": "Loan A",
+    "balance": 2000,
+    "min_payment": 150,
+    "interest_rate": 8.0,
+    "target": false
+  }
 ]
 ```
 
 ---
 
-## ⚙️ Logic: Snowball vs Avalanche
+## 🧠 Logic Implementation
 
-### Snowball
+### Snowball:
 
-```js
-debts.sort((a, b) => a.balance - b.balance);
+```python
+sorted_debts = sorted(debts, key=lambda d: d.balance)
 ```
 
-### Avalanche
+### Avalanche:
 
-```js
-debts.sort((a, b) => b.interestRate - a.interestRate);
+```python
+sorted_debts = sorted(debts, key=lambda d: d.interest_rate, reverse=True)
 ```
 
-### Optionally Add:
-
-* Flag the top item with `target: true`
-* Return ordered list to frontend for display
+* Return sorted list
+* Add `"target": True` to the first debt in the repayment order
 
 ---
 
-## 🧠 Optional Calculation: Months to Payoff
+## 🗃️ Data Model (In-memory for MVP)
 
-```js
-function monthsToPayoff(balance, minPayment, extra, rate) {
-  let months = 0;
-  const monthlyRate = rate / 12 / 100;
-  while (balance > 0 && months < 1000) {
-    let interest = balance * monthlyRate;
-    balance = balance + interest - (minPayment + extra);
-    months++;
-  }
-  return months;
-}
+### FastAPI Schema (`schemas.py`)
+
+```python
+from pydantic import BaseModel
+
+class Debt(BaseModel):
+    name: str
+    balance: float
+    min_payment: float
+    interest_rate: float
+
+class CalculationRequest(BaseModel):
+    debts: list[Debt]
+    strategy: str
+    extra_payment: float
 ```
+
+> No database is needed for the MVP. Debts can be stored in a simple list.
 
 ---
 
-## 🧪 Sample Component Structure (React)
+## 🧪 React Component Layout
 
 ```
 src/
@@ -200,13 +183,15 @@ src/
 │   └── DebtCard.jsx
 ```
 
-## 🔮 Stretch Features (Post-MVP)
 
-| Feature               | Description                        |
-| --------------------- | ---------------------------------- |
-| Amortization Schedule | Month-by-month repayment breakdown |
-| Charts                | Visualize progress (Chart.js)      |
-| Payment History       | Track which months are paid        |
-| Export                | Download plan as PDF               |
-| Data Persistence      | Use localStorage or MongoDB        |
+## 🎯 Stretch Features (If Time Allows)
+
+| Feature            | Description                                 |
+| ------------------ | ------------------------------------------- |
+| Amortization Table | Month-wise payoff simulation                |
+| Charts             | Use Chart.js for balance tracking           |
+| Export             | Download repayment plan as PDF              |
+| localStorage Sync  | Save user session locally                   |
+| Deployment         | Host on Vercel (frontend), Render (backend) |
+
 
