@@ -1,22 +1,16 @@
 import React from "react";
 import DebtCard from "./DebtCard";
 
-function DebtList({ debts, strategy, extraPayment, onRemoveDebt }) {
-  // Sort debts according to strategy
-  let sortedDebts = [...debts];
-  if (strategy === "snowball") {
-    sortedDebts.sort((a, b) => a.balance - b.balance);
-  } else {
-    sortedDebts.sort((a, b) => b.interest_rate - a.interest_rate);
-  }
+function DebtList({ debts, onRemoveDebt }) {
+  // The debts are already sorted and marked with target by the backend
   return (
-    <div>
-      {sortedDebts.map((debt, idx) => (
+    <div className="debt-list">
+      {debts.map((debt) => (
         <DebtCard
-          key={idx}
+          key={debt.id}
           debt={debt}
-          isTarget={idx === 0}
-          onRemove={() => onRemoveDebt(debts.indexOf(debt))}
+          isTarget={debt.target}
+          onRemove={() => onRemoveDebt(debt.id)}
         />
       ))}
     </div>
